@@ -1,0 +1,399 @@
+{
+  "domains": [
+    {
+      "id": "generic_1768654342615",
+      "name": "Helthcare",
+      "description": "Custom data structure",
+      "keywords": [
+        "hospitaloverview",
+        "departmentperformance",
+        "patientadmissions",
+        "topdiagnoses"
+      ],
+      "questions": [
+        {
+          "id": "priority",
+          "text": "What is your primary focus?",
+          "options": [
+            "Overview metrics",
+            "Detailed lists",
+            "Activity/timeline",
+            "All equal"
+          ],
+          "impact": "layout_weight"
+        },
+        {
+          "id": "metric_style",
+          "text": "How should metrics be displayed?",
+          "options": [
+            "Cards with trends",
+            "Simple numbers",
+            "With charts"
+          ],
+          "impact": "component_selection"
+        }
+      ],
+      "layoutHints": {
+        "preferredLayout": "grid",
+        "emphasize": "balanced"
+      },
+      "createdBy": "ai",
+      "createdAt": "2026-01-17T12:52:22.615Z"
+    },
+    {
+      "id": "generic_1768654928099",
+      "name": "Education",
+      "description": "Custom data structure",
+      "keywords": [
+        "schoolmetrics",
+        "gradedistribution",
+        "departmentperformance",
+        "enrollmentbyyear",
+        "studentactivities"
+      ],
+      "questions": [
+        {
+          "id": "priority",
+          "text": "What is your primary focus?",
+          "options": [
+            "Overview metrics",
+            "Detailed lists",
+            "Activity/timeline",
+            "All equal"
+          ],
+          "impact": "layout_weight"
+        },
+        {
+          "id": "metric_style",
+          "text": "How should metrics be displayed?",
+          "options": [
+            "Cards with trends",
+            "Simple numbers",
+            "With charts"
+          ],
+          "impact": "component_selection"
+        }
+      ],
+      "layoutHints": {
+        "preferredLayout": "grid",
+        "emphasize": "balanced"
+      },
+      "createdBy": "ai",
+      "createdAt": "2026-01-17T13:02:08.099Z"
+    },
+    {
+      "id": "generic_1768655702028",
+      "name": "Fitness",
+      "description": "Custom data structure",
+      "keywords": [
+        "gymmetrics",
+        "membershiptypes",
+        "classattendance",
+        "membersbyage",
+        "revenuestreams"
+      ],
+      "questions": [
+        {
+          "id": "priority",
+          "text": "What is your primary focus?",
+          "options": [
+            "Overview metrics",
+            "Detailed lists",
+            "Activity/timeline",
+            "All equal"
+          ],
+          "impact": "layout_weight"
+        },
+        {
+          "id": "metric_style",
+          "text": "How should metrics be displayed?",
+          "options": [
+            "Cards with trends",
+            "Simple numbers",
+            "With charts"
+          ],
+          "impact": "component_selection"
+        }
+      ],
+      "layoutHints": {
+        "preferredLayout": "grid",
+        "emphasize": "balanced"
+      },
+      "createdBy": "ai",
+      "createdAt": "2026-01-17T13:15:02.028Z"
+    },
+    {
+      "id": "generic_1768660702464",
+      "name": "Generic Data",
+      "description": "Custom data structure",
+      "keywords": [
+        "marketoverview",
+        "propertytypes",
+        "pricebyneighborhood",
+        "salesbymonth",
+        "topagents"
+      ],
+      "questions": [
+        {
+          "id": "priority",
+          "text": "What is your primary focus?",
+          "options": [
+            "Overview metrics",
+            "Detailed lists",
+            "Activity/timeline",
+            "All equal"
+          ],
+          "impact": "layout_weight"
+        },
+        {
+          "id": "metric_style",
+          "text": "How should metrics be displayed?",
+          "options": [
+            "Cards with trends",
+            "Simple numbers",
+            "With charts"
+          ],
+          "impact": "component_selection"
+        }
+      ],
+      "layoutHints": {
+        "preferredLayout": "grid",
+        "emphasize": "balanced"
+      },
+      "createdBy": "ai",
+      "createdAt": "2026-01-17T14:38:22.464Z"
+    },
+    {
+      "id": "generic_1768661691932",
+      "name": "Restaurant",
+      "description": "Custom data structure",
+      "keywords": [
+        "dailymetrics",
+        "populardishes",
+        "revenuebyhour",
+        "tableoccupancy",
+        "staffperformance"
+      ],
+      "questions": [
+        {
+          "id": "priority",
+          "text": "What is your primary focus?",
+          "options": [
+            "Overview metrics",
+            "Detailed lists",
+            "Activity/timeline",
+            "All equal"
+          ],
+          "impact": "layout_weight"
+        },
+        {
+          "id": "metric_style",
+          "text": "How should metrics be displayed?",
+          "options": [
+            "Cards with trends",
+            "Simple numbers",
+            "With charts"
+          ],
+          "impact": "component_selection"
+        }
+      ],
+      "layoutHints": {
+        "preferredLayout": "grid",
+        "emphasize": "balanced"
+      },
+      "createdBy": "ai",
+      "createdAt": "2026-01-17T14:54:51.932Z"
+    },
+    {
+      "id": "generic_1768748216745",
+      "name": "saas",
+      "description": "Custom data structure",
+      "keywords": [
+        "businessmetrics",
+        "subscriptiontiers",
+        "userengagement",
+        "featureusage",
+        "growthmetrics"
+      ],
+      "questions": [
+        {
+          "id": "priority",
+          "text": "What is your primary focus?",
+          "options": [
+            "Overview metrics",
+            "Detailed lists",
+            "Activity/timeline",
+            "All equal"
+          ],
+          "impact": "layout_weight"
+        },
+        {
+          "id": "metric_style",
+          "text": "How should metrics be displayed?",
+          "options": [
+            "Cards with trends",
+            "Simple numbers",
+            "With charts"
+          ],
+          "impact": "component_selection"
+        }
+      ],
+      "layoutHints": {
+        "preferredLayout": "grid",
+        "emphasize": "balanced"
+      },
+      "createdBy": "ai",
+      "createdAt": "2026-01-18T14:56:56.745Z"
+    },
+    {
+      "id": "generic_1768748971992",
+      "name": "Generic Data",
+      "description": "Custom data structure",
+      "keywords": [
+        "healthcare",
+        "education",
+        "fitness",
+        "realestate",
+        "restaurant"
+      ],
+      "questions": [
+        {
+          "id": "priority",
+          "text": "What is your primary focus?",
+          "options": [
+            "Overview metrics",
+            "Detailed lists",
+            "Activity/timeline",
+            "All equal"
+          ],
+          "impact": "layout_weight"
+        },
+        {
+          "id": "metric_style",
+          "text": "How should metrics be displayed?",
+          "options": [
+            "Cards with trends",
+            "Simple numbers",
+            "With charts"
+          ],
+          "impact": "component_selection"
+        }
+      ],
+      "layoutHints": {
+        "preferredLayout": "grid",
+        "emphasize": "balanced"
+      },
+      "createdBy": "ai",
+      "createdAt": "2026-01-18T15:09:31.992Z"
+    },
+    {
+      "id": "customer_support",
+      "name": "Reclamantions/Retruns",
+      "description": "Management of customer complaints, feedback, and support ticket lifecycles.",
+      "keywords": [
+        "reclamations",
+        "tickets",
+        "claims",
+        "resolution",
+        "status",
+        "priority",
+        "feedback"
+      ],
+      "questions": [
+        {
+          "id": "support_priority_metric",
+          "text": "What is the most critical metric for these reclamations?",
+          "options": [
+            "Resolution Time",
+            "Volume of Open Claims",
+            "Customer Satisfaction Score",
+            "First Response Time"
+          ],
+          "impact": "section_priority"
+        },
+        {
+          "id": "reclamation_grouping",
+          "text": "How should the reclamations be categorized for analysis?",
+          "options": [
+            "By Status (Open/Closed)",
+            "By Priority Level",
+            "By Product Category",
+            "By Assigned Agent"
+          ],
+          "impact": "layout_weight"
+        },
+        {
+          "id": "view_style",
+          "text": "How do users primarily interact with this data?",
+          "options": [
+            "Monitoring real-time volume",
+            "Processing individual items in a list",
+            "Reviewing long-term trends",
+            "Auditing resolution quality"
+          ],
+          "impact": "visualization_style"
+        }
+      ],
+      "layoutHints": {
+        "preferredLayout": "grid",
+        "emphasize": "lists"
+      },
+      "createdBy": "ai",
+      "createdAt": "2026-01-19T17:37:50.908Z"
+    },
+    {
+      "id": "customer_support_claims",
+      "name": "Customer Support & Claims",
+      "description": "Management of customer complaints, support tickets, and formal reclamation processes.",
+      "keywords": [
+        "reclamations",
+        "metadata",
+        "status",
+        "priority",
+        "resolution",
+        "tickets"
+      ],
+      "questions": [
+        {
+          "id": "view_priority",
+          "text": "What is the primary focus for this dashboard?",
+          "options": [
+            "Tracking individual claim details",
+            "Monitoring overall volume and trends",
+            "Managing agent workload",
+            "Compliance and resolution deadlines"
+          ],
+          "impact": "section_priority"
+        },
+        {
+          "id": "list_density",
+          "text": "How should the reclamation list be displayed?",
+          "options": [
+            "Detailed cards with full descriptions",
+            "Compact table for high-volume processing",
+            "Kanban board by status",
+            "Timeline of claim events"
+          ],
+          "impact": "visualization_style"
+        },
+        {
+          "id": "metadata_importance",
+          "text": "How important is the metadata (source, timestamps, categories) relative to the claim content?",
+          "options": [
+            "Primary focus for filtering",
+            "Secondary context only",
+            "Equal importance to claim text",
+            "Hidden by default"
+          ],
+          "impact": "layout_weight"
+        }
+      ],
+      "layoutHints": {
+        "preferredLayout": "single-column",
+        "emphasize": "lists"
+      },
+      "createdBy": "ai",
+      "createdAt": "2026-01-19T17:44:56.977Z"
+    }
+  ]
+}
