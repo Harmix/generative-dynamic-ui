@@ -17,10 +17,11 @@ This project demonstrates a novel approach to UI generation:
 # Install dependencies
 pnpm install
 
-# Set up AI analysis (optional but recommended)
+# Set up AI analysis (optional - you can also pass API key directly in the UI)
 # 1. Get a free API key from https://aistudio.google.com/apikey
-# 2. Create .env.local file in the project root
-# 3. Add: NEXT_PUBLIC_GEMINI_API_KEY=your_api_key_here
+# 2. Either pass it directly in the UI, or:
+#    - Create .env.local file in the project root
+#    - Add: NEXT_PUBLIC_GEMINI_API_KEY=your_api_key_here
 
 # Run development server
 pnpm dev
@@ -38,13 +39,14 @@ The system now includes AI-powered analysis using Google Gemini to automatically
 
 ### Setup
 1. Get a free API key from [Google AI Studio](https://aistudio.google.com/apikey)
-2. Create a `.env.local` file in the project root
-3. Add your key:
-```
-NEXT_PUBLIC_GEMINI_API_KEY=your_api_key_here
-```
+2. Either:
+   - **Pass directly in UI**: Enter your API key in the input field on the main page
+   - **Use environment variable**: Create a `.env.local` file and add:
+     ```
+     NEXT_PUBLIC_GEMINI_API_KEY=your_api_key_here
+     ```
 
-Without the API key, the system falls back to local pattern matching.
+Without an API key, the system falls back to local pattern matching.
 
 ## System Architecture
 
