@@ -2,8 +2,6 @@
   <h1 align="center">Generative Dynamic UI Builder</h1>
 </p>
 
----
-
 <p align="center">
   <img src="public/demo.gif" alt="Sales dashboard generated from raw data">
 </p>
