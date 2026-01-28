@@ -1,15 +1,61 @@
-# Dynamic UI Builder
+<p align="center">
+  <h1 align="center">Generative Dynamic UI Builder</h1>
+</p>
 
+---
+
+<p align="center">
+  <img src="public/demo.gif" alt="Sales dashboard generated from raw data">
+</p>
+<p>
+    <i>
+        Example: Sales dashboard generated from raw data
+    </i>
+</p>
+
+<p align="center">
+  <a href="https://manager.harmix.ai/research/generative-dynamic-ui">
+    <img src="https://img.shields.io/badge/🚀_Try_Live_Demo-Generative_UI_Builder-5C2D91?style=for-the-badge&labelColor=3C1E5D" alt="Try Live Demo">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://manager.harmix.ai/">
+    <img src="https://img.shields.io/badge/Harmix-PAM%20Landing-orange" alt="Harmix PAM">
+  </a>
+
+  <a href="https://www.linkedin.com/company/harmix-proactive-ai-manager/posts/?feedView=all">
+    <img src="https://img.shields.io/badge/LinkedIn-Harmix-0077B5?logo=linkedin&logoColor=white" alt="LinkedIn">
+  </a>
+</p>
+
+<p align="center">
 A constrained UI generation system where interfaces are built using only a predefined component library. The system evaluates context, gathers requirements through questions, then generates and evolves UIs predictably.
+</p>
 
-## Overview
-
-This project demonstrates a novel approach to UI generation:
+## Features
 
 - **Constrained Palette** - Limited to 12 components (no arbitrary HTML/CSS)
-- **Context-Driven** - UI structure derived from input data shape
+- **AI Domain Detection** - Automatically identifies data domain using Google Gemini
+- **Auto-Configuration Generation** - Creates new domain patterns for unknown data types
 - **Iterative Refinement** - Questions narrow down requirements before generation
+- **Learning & Persistence** - Saves new configurations for future use
+- **Context-Driven** - UI structure derived from input data shape
 - **Persistent Evolution** - Changes are additive/predictable, not random rebuilds
+
+---
+
+## Tech Stack
+
+| Category | Technology |
+|----------|-----------|
+| Framework | Next.js 16 (App Router) |
+| Styling | TailwindCSS v4 |
+| UI Components | Radix UI |
+| Language | TypeScript |
+| AI Provider | Google Gemini |
+
+---
 
 ## Quick Start
 
@@ -29,17 +75,14 @@ pnpm dev
 # Open http://localhost:3000
 ```
 
-## AI-Powered JSON Analysis
+---
 
-The system now includes AI-powered analysis using Google Gemini to automatically:
-- Detect if your JSON matches existing domain configurations
-- Generate new domain configurations for unknown data types
-- Create context-specific questions for better UI generation
-- Save new configurations for future use
+## API Key Setup
 
-### Setup
-1. Get a free API key from [Google AI Studio](https://aistudio.google.com/apikey)
-2. Either:
+Get your free Google Gemini API key to enable AI-powered analysis:
+
+1. Visit [Google AI Studio](https://aistudio.google.com/apikey) to get your API key
+2. Choose one of two options:
    - **Pass directly in UI**: Enter your API key in the input field on the main page
    - **Use environment variable**: Create a `.env.local` file and add:
      ```
@@ -47,6 +90,8 @@ The system now includes AI-powered analysis using Google Gemini to automatically
      ```
 
 Without an API key, the system falls back to local pattern matching.
+
+---
 
 ## System Architecture
 
@@ -76,6 +121,8 @@ Input Context → Analyze → Questions → Generate → Render UI
 - Resolves data bindings (`$data.path` syntax)
 - Renders actual React components
 
+---
+
 ## Component Library
 
 ### Layout Components
@@ -98,12 +145,7 @@ Input Context → Analyze → Questions → Generate → Render UI
 - **Badge** - Status indicators
 - **Progress** - Completion states
 
-## Tech Stack
-
-- **Framework**: Next.js 16 (App Router)
-- **Styling**: TailwindCSS v4
-- **UI Components**: Radix UI
-- **Language**: TypeScript
+---
 
 ## Project Structure
 
@@ -124,6 +166,8 @@ Input Context → Analyze → Questions → Generate → Render UI
 │   └── utils.ts          # Utility functions
 └── dynamic-ui-plan.md    # Detailed system plan
 ```
+
+---
 
 ## Example Usage
 
@@ -158,6 +202,8 @@ const schema = generateUI(context, analysis, answers)
 <DynamicRenderer schema={schema} data={context.data} />
 ```
 
+---
+
 ## Data Binding
 
 The system supports dynamic data binding:
@@ -177,6 +223,8 @@ Supported patterns:
 - `$item.field` - Bind to list item (in loops)
 - Nested paths: `$data.user.profile.name`
 
+---
+
 ## Development
 
 ```bash
@@ -190,6 +238,8 @@ pnpm build
 pnpm start
 ```
 
+---
+
 ## Key Features
 
 - ✅ Type-safe schema validation
@@ -200,9 +250,13 @@ pnpm start
 - ✅ Predictable UI evolution
 - ✅ Data binding system
 
+---
+
 ## Learn More
 
 See [`dynamic-ui-plan.md`](./dynamic-ui-plan.md) for the complete system design and philosophy.
+
+---
 
 ## License
 
