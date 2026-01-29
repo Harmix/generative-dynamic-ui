@@ -568,14 +568,27 @@ export async function generateUIWithAI(
   reasoning?: string;
 }> {
   try {
-    console.log('Attempting AI-powered UI generation...', { data, analysis, answers });
+    console.log('[Generator] Attempting AI-powered UI generation...', {
+      dataKeys: Object.keys(data),
+      analysisContext: analysis.detectedContext,
+      hasAnswers: !!answers
+    });
 
     // Call Gemini to generate schema or questions
     const aiResponse = await generateSchemaWithGemini(data, analysis, answers, apiKey);
-    
-    if (aiResponse.needsQuestions && aiResponse.questions) {
+
+    console.log('[Generator] AI response received:', {
+      needsQuestions: aiResponse.needsQuestions,
+      hasQuestions: !!aiResponse.questions,
+      questionsCount: aiResponse.questions?.length,
+      hasSchema: !!aiResponse.schema,
+      schemaComponent: aiResponse.schema?.component,
+      reasoning: aiResponse.reasoning?.substring(0, 100)
+    });
+
+    if (aiResponse.needsQuestions && aiResponse.questions && aiResponse.questions.length > 0) {
       // AI determined questions are needed
-      console.log('AI determined questions are needed:', aiResponse.reasoning);
+      console.log('[Generator] AI determined questions are needed:', aiResponse.reasoning);
       return {
         needsQuestions: true,
         questions: aiResponse.questions,
@@ -583,25 +596,37 @@ export async function generateUIWithAI(
       };
     } else if (aiResponse.schema) {
       // AI generated schema directly
-      console.log('AI generated schema directly:', aiResponse.reasoning);
-      
+      console.log('[Generator] AI generated schema directly:', aiResponse.reasoning);
+
+      console.log('[Generator] Schema structure:', JSON.stringify(aiResponse.schema, null, 2).substring(0, 500));
+
       // Validate the schema
       const validation = validateSchema(aiResponse.schema);
       if (!validation.valid) {
-        console.warn('AI-generated schema has validation warnings:', validation.errors);
+        console.warn('[Generator] AI-generated schema has validation warnings:', validation.errors);
       }
-      
+
       return {
         needsQuestions: false,
         schema: aiResponse.schema,
         reasoning: aiResponse.reasoning
       };
+    } else if (!aiResponse.needsQuestions) {
+      // AI said no questions needed but didn't provide schema - generate with rules
+      console.warn('[Generator] AI said needsQuestions=false but no schema provided, using rule-based generation');
+      const schema = generateUI(data, analysis, answers || {});
+      return {
+        needsQuestions: false,
+        schema,
+        reasoning: aiResponse.reasoning || 'AI provided no schema, used rule-based generation'
+      };
     } else {
+      console.error('[Generator] Invalid AI response structure:', JSON.stringify(aiResponse, null, 2));
       throw new Error('Invalid AI response: neither questions nor schema provided');
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.warn('AI generation failed, falling back to rule-based generation:', errorMessage);
+    console.warn('[Generator] AI generation failed, falling back to rule-based generation:', errorMessage);
 
     // Fallback to rule-based generation
     const schema = generateUI(data, analysis, answers || {});
