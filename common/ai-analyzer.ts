@@ -4,9 +4,64 @@
 import { DomainConfig, matchDomain, SYSTEM_DOMAINS } from './domains';
 import { Question, ContextAnalysis } from './analyzer';
 import { ComponentSchema, COMPONENT_SPECS } from './components';
-import { AIGenerationResponseSchema, AIGenerationResponse } from './schema';
+import { AIGenerationResponseSchema, AIGenerationResponseLooseSchema, AIGenerationResponse } from './schema';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { UserAnswers } from './generator';
+
+// Clean JSON schema for Gemini compatibility
+// Gemini doesn't support many JSON Schema features
+function cleanSchemaForGemini(schema: any): any {
+  if (schema === null || typeof schema !== 'object') {
+    return schema;
+  }
+
+  if (Array.isArray(schema)) {
+    return schema.map(cleanSchemaForGemini);
+  }
+
+  const cleaned: any = {};
+
+  for (const [key, value] of Object.entries(schema)) {
+    // Skip unsupported properties
+    if ([
+      '$schema',
+      '$id',
+      '$ref',
+      '$defs',
+      'definitions',
+      'additionalProperties',
+      'additionalItems',
+      'propertyNames',
+      'patternProperties',
+      'unevaluatedProperties',
+      'unevaluatedItems',
+      'contentEncoding',
+      'contentMediaType',
+      'if',
+      'then',
+      'else',
+      'allOf',
+      'oneOf',
+      'not',
+      'default'
+    ].includes(key)) {
+      console.log(`[AI] Removing unsupported schema property: ${key}`);
+      continue;
+    }
+
+    // Handle anyOf - Gemini may not support it well, simplify to first option
+    if (key === 'anyOf' && Array.isArray(value) && value.length > 0) {
+      console.log('[AI] Converting anyOf to first option');
+      const firstOption = cleanSchemaForGemini(value[0]);
+      Object.assign(cleaned, firstOption);
+      continue;
+    }
+
+    cleaned[key] = cleanSchemaForGemini(value);
+  }
+
+  return cleaned;
+}
 
 export interface AIAnalysisResult {
   needsNewDomain: boolean;
@@ -256,17 +311,35 @@ export async function generateSchemaWithGemini(
   answers?: UserAnswers,
   providedApiKey?: string
 ): Promise<AIGenerationResponse> {
+  console.log('[AI] generateSchemaWithGemini called with:', {
+    dataKeys: Object.keys(data),
+    analysis: {
+      detectedContext: analysis.detectedContext,
+      dataTypes: analysis.dataTypes,
+      entities: analysis.entities
+    },
+    hasAnswers: !!answers,
+    answers
+  });
+
   const apiKey = getGeminiAPIKey(providedApiKey);
 
   if (!apiKey) {
+    console.error('[AI] No API key found');
     throw new Error('Gemini API key not found');
   }
 
   const prompt = buildSchemaGenerationPrompt(data, analysis, answers);
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+  console.log('[AI] Generated prompt length:', prompt.length);
+  console.log('[AI] Prompt preview:', prompt.substring(0, 500) + '...');
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey.substring(0, 10)}...`;
+  console.log('[AI] Calling Gemini API:', url);
 
   // Try with structured output first, fallback to plain JSON if it fails
   const tryGeneration = async (useStructuredOutput: boolean) => {
+    console.log(`[AI] tryGeneration called with useStructuredOutput=${useStructuredOutput}`);
+
     const generationConfig: Record<string, any> = {
       temperature: 0.3,
       topK: 40,
@@ -275,38 +348,166 @@ export async function generateSchemaWithGemini(
     };
 
     if (useStructuredOutput) {
-      const jsonSchema = zodToJsonSchema(AIGenerationResponseSchema as any);
+      // Gemini-compliant schema - no additionalProperties, all props explicit
+      const propsSchema = {
+        type: 'object',
+        description: 'Component props',
+        properties: {
+          title: { type: 'string', description: 'Title for Card/Section' },
+          subtitle: { type: 'string', description: 'Subtitle' },
+          label: { type: 'string', description: 'Label for Metric/Button' },
+          value: { type: 'string', description: 'Value or data binding like $data.field' },
+          cols: { type: 'integer', description: 'Number of columns for Container (1-4)' },
+          gap: { type: 'string', description: 'Gap size: sm, md, lg' },
+          colspan: { type: 'integer', description: 'Column span' },
+          type: { type: 'string', description: 'Chart type: bar, line, pie' },
+          data: { type: 'string', description: 'Data binding for charts like $data.field' },
+          items: { type: 'string', description: 'Data binding for lists/tables like $data.arrayField' },
+          rows: { type: 'string', description: 'Data binding for table rows' },
+          columns: { type: 'array', items: { type: 'string' }, description: 'Column names for Table' },
+          icon: { type: 'string', description: 'Icon name' },
+          trend: { type: 'string', description: 'Trend: up, down, neutral, warning' },
+          avatar: { type: 'boolean', description: 'Show avatars in List' },
+          sortable: { type: 'boolean', description: 'Enable sorting in Table' },
+          variant: { type: 'string', description: 'Button variant: default, outline, ghost' },
+          action: { type: 'string', description: 'Action name' },
+          color: { type: 'string', description: 'Color for Badge' },
+          max: { type: 'integer', description: 'Max value for Progress' },
+          collapsible: { type: 'boolean', description: 'Section collapsible' },
+          defaultOpen: { type: 'boolean', description: 'Section default open' }
+        }
+      };
+
+      // Level 3 component (leaf - no children)
+      const componentLevel3 = {
+        type: 'object',
+        properties: {
+          component: { type: 'string', description: 'Component type' },
+          props: propsSchema
+        },
+        required: ['component', 'props']
+      };
+
+      // Level 2 component
+      const componentLevel2 = {
+        type: 'object',
+        properties: {
+          component: { type: 'string', description: 'Component type' },
+          props: propsSchema,
+          children: { type: 'array', items: componentLevel3 }
+        },
+        required: ['component', 'props']
+      };
+
+      // Level 1 component
+      const componentLevel1 = {
+        type: 'object',
+        properties: {
+          component: { type: 'string', description: 'Component type' },
+          props: propsSchema,
+          children: { type: 'array', items: componentLevel2 }
+        },
+        required: ['component', 'props']
+      };
+
+      const geminiSchema = {
+        type: 'object',
+        properties: {
+          needsQuestions: {
+            type: 'boolean',
+            description: 'false for simple data, true for complex data needing clarification'
+          },
+          reasoning: {
+            type: 'string',
+            description: 'Brief explanation'
+          },
+          questions: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                text: { type: 'string' },
+                options: { type: 'array', items: { type: 'string' } },
+                impact: { type: 'string' }
+              },
+              required: ['id', 'text', 'options', 'impact']
+            }
+          },
+          schema: {
+            type: 'object',
+            properties: {
+              component: { type: 'string', description: 'Root component (Container)' },
+              props: propsSchema,
+              children: { type: 'array', items: componentLevel1 }
+            },
+            required: ['component', 'props']
+          }
+        },
+        required: ['needsQuestions']
+      };
+
       generationConfig.responseMimeType = 'application/json';
-      generationConfig.responseSchema = jsonSchema;
+      generationConfig.responseSchema = geminiSchema;
+      console.log('[AI] Using Gemini schema (no additionalProperties)');
     }
 
-    const response = await fetch(url, {
+    const requestBody = {
+      contents: [{
+        parts: [{
+          text: useStructuredOutput ? prompt : prompt + '\n\nRespond with valid JSON only, no markdown code blocks.'
+        }]
+      }],
+      generationConfig
+    };
+
+    console.log('[AI] Request config:', {
+      temperature: generationConfig.temperature,
+      maxOutputTokens: generationConfig.maxOutputTokens,
+      hasResponseSchema: !!generationConfig.responseSchema,
+      responseMimeType: generationConfig.responseMimeType
+    });
+
+    if (useStructuredOutput) {
+      console.log('[AI] Full responseSchema:', JSON.stringify(generationConfig.responseSchema, null, 2));
+    }
+
+    const fullUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+    const response = await fetch(fullUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: useStructuredOutput ? prompt : prompt + '\n\nRespond with valid JSON only, no markdown code blocks.'
-          }]
-        }],
-        generationConfig
-      })
+      body: JSON.stringify(requestBody)
     });
+
+    console.log('[AI] Response status:', response.status, response.statusText);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini API error response:', errorText);
+      console.error('[AI] Gemini API error response:', errorText);
       throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
     }
 
     const result = await response.json();
+
+    console.log('[AI] Response structure:', {
+      hasCandidates: !!result.candidates,
+      candidatesLength: result.candidates?.length,
+      finishReason: result.candidates?.[0]?.finishReason,
+      safetyRatings: result.candidates?.[0]?.safetyRatings
+    });
+
     const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!text) {
+      console.error('[AI] No text in response:', JSON.stringify(result, null, 2).substring(0, 1000));
       throw new Error('No response from Gemini API');
     }
+
+    console.log('[AI] Raw response text length:', text.length);
+    console.log('[AI] Raw response (full):', text);
 
     return text;
   };
@@ -315,24 +516,54 @@ export async function generateSchemaWithGemini(
     // First try with structured output
     let text: string;
     try {
+      console.log('[AI] Attempting structured output generation...');
       text = await tryGeneration(true);
+      console.log('[AI] Structured output succeeded');
     } catch (structuredError) {
-      console.warn('Structured output failed, trying plain JSON:', structuredError);
+      console.warn('[AI] Structured output failed, trying plain JSON:', structuredError);
       text = await tryGeneration(false);
+      console.log('[AI] Plain JSON generation succeeded');
     }
 
     // Parse JSON (strip markdown if present)
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.error('[AI] Could not extract JSON from response:', text.substring(0, 500));
       throw new Error('Could not parse JSON from AI response');
     }
 
-    const parsed = JSON.parse(jsonMatch[0]);
-    const validated = AIGenerationResponseSchema.parse(parsed);
+    console.log('[AI] Extracted JSON length:', jsonMatch[0].length);
 
-    return validated;
+    const parsed = JSON.parse(jsonMatch[0]);
+
+    console.log('[AI] Parsed response:', {
+      needsQuestions: parsed.needsQuestions,
+      hasReasoning: !!parsed.reasoning,
+      reasoning: parsed.reasoning?.substring(0, 100),
+      questionsCount: parsed.questions?.length,
+      hasSchema: !!parsed.schema,
+      schemaIsArray: Array.isArray(parsed.schema),
+      schemaComponent: parsed.schema?.component
+    });
+
+    // Handle case where AI returns schema as array instead of single root component
+    if (parsed.schema && Array.isArray(parsed.schema)) {
+      console.log('[AI] Schema is array, wrapping in Container component');
+      parsed.schema = {
+        component: 'Container',
+        props: { cols: 3, gap: 'md' },
+        children: parsed.schema
+      };
+    }
+
+    // Use loose schema for validation - accepts any depth of nesting
+    const validated = AIGenerationResponseLooseSchema.parse(parsed);
+    console.log('[AI] Validation passed with loose schema');
+
+    // Cast to full type (the loose schema is more permissive)
+    return validated as AIGenerationResponse;
   } catch (error) {
-    console.error('Gemini schema generation failed:', error);
+    console.error('[AI] Gemini schema generation failed:', error);
     throw error;
   }
 }
@@ -405,6 +636,7 @@ RULES FOR CHARTS:
     }
 
     prompt += `GENERAL RULES:
+- IMPORTANT: The schema field must be a SINGLE root object (Container component), NOT an array
 - Use data bindings like "$data.fieldName" for dynamic values
 - Container component should be the root with cols and gap props
 - Wrap content in Card components with titles
@@ -433,6 +665,7 @@ IMPORTANT RULES FOR METRICS (default behavior):
 - The Chart component can handle nested objects if needed for visualization
 
 GENERAL RULES:
+- IMPORTANT: The schema field must be a SINGLE root object (Container component), NOT an array
 - Use data bindings like "$data.fieldName" for dynamic values
 - Container component should be the root with cols and gap props
 - Wrap content in Card components with titles

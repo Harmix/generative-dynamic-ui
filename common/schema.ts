@@ -129,7 +129,37 @@ export const ComponentPropsSchema = z.union([
   ProgressPropsSchema
 ]);
 
-// Recursive component schema
+// Non-recursive component schemas for Gemini (it doesn't support $ref)
+// Define explicit depth levels: Component > Children (Level 1) > Children (Level 2) > Children (Level 3)
+
+// Level 3 - deepest (leaf components, no children)
+const ComponentLevel3Schema = z.object({
+  component: ComponentTypeSchema.describe('Component type'),
+  props: z.record(z.string(), z.any()).describe('Component props')
+});
+
+// Level 2 - can contain Level 3
+const ComponentLevel2Schema = z.object({
+  component: ComponentTypeSchema.describe('Component type'),
+  props: z.record(z.string(), z.any()).describe('Component props'),
+  children: z.array(ComponentLevel3Schema).optional().describe('Child components')
+});
+
+// Level 1 - can contain Level 2
+const ComponentLevel1Schema = z.object({
+  component: ComponentTypeSchema.describe('Component type'),
+  props: z.record(z.string(), z.any()).describe('Component props'),
+  children: z.array(ComponentLevel2Schema).optional().describe('Child components')
+});
+
+// Root level - can contain Level 1
+const ComponentRootSchema = z.object({
+  component: ComponentTypeSchema.describe('Root component type (usually Container)'),
+  props: z.record(z.string(), z.any()).describe('Component props'),
+  children: z.array(ComponentLevel1Schema).optional().describe('Child components')
+});
+
+// Keep the recursive type for runtime validation (after AI generation)
 export type ComponentSchemaZod = z.infer<typeof ComponentSchemaZodType>;
 
 export const ComponentSchemaZodType: z.ZodType<{
@@ -146,17 +176,30 @@ export const ComponentSchemaZodType: z.ZodType<{
   children: z.lazy(() => z.array(ComponentSchemaZodType)).optional().describe('Optional child components')
 });
 
-// Schema for AI generation response
+// Schema for AI generation response - uses non-recursive schema for Gemini compatibility
 export const AIGenerationResponseSchema = z.object({
   needsQuestions: z.boolean().describe('Whether user questions are needed. Set to false for simple data (1-3 metrics, 1-2 lists). Set to true for complex data (5+ entities, nested structures, ambiguous priorities)'),
-  reasoning: z.string().describe('Brief explanation of why questions are or are not needed'),
+  reasoning: z.string().optional().describe('Brief explanation of why questions are or are not needed'),
   questions: z.array(z.object({
     id: z.string().describe('Unique question ID like priority, metric_style, etc'),
     text: z.string().describe('Question text to ask the user'),
     options: z.array(z.string()).describe('3-4 answer options'),
     impact: z.string().describe('What this affects: layout_weight, section_priority, component_selection, visualization_style, etc')
   })).optional().describe('Questions to ask user if needsQuestions is true'),
-  schema: ComponentSchemaZodType.optional().describe('Generated UI schema if needsQuestions is false')
+  schema: ComponentRootSchema.optional().describe('Generated UI schema if needsQuestions is false. Must be a single root Container component.')
+});
+
+// Looser schema for validating AI response (accepts any depth of nesting)
+export const AIGenerationResponseLooseSchema = z.object({
+  needsQuestions: z.boolean(),
+  reasoning: z.string().optional(),
+  questions: z.array(z.object({
+    id: z.string(),
+    text: z.string(),
+    options: z.array(z.string()),
+    impact: z.string()
+  })).optional(),
+  schema: z.any().optional()
 });
 
 export type AIGenerationResponse = z.infer<typeof AIGenerationResponseSchema>;
