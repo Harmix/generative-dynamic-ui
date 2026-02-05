@@ -12,24 +12,31 @@
 </p>
 
 <p align="center">
-  <a href="https://manager.harmix.ai/research/generative-dynamic-ui">
+  <a href="https://manager.harmix.ai/research/generative-dynamic-ui?utm_source=github&utm_medium=referral&utm_campaign=own_media&utm_content=ui_interface">
     <img src="https://img.shields.io/badge/🚀_Try_Live_Demo-Generative_UI_Builder-5C2D91?style=for-the-badge&labelColor=3C1E5D" alt="Try Live Demo">
   </a>
 </p>
 
 <p align="center">
-  <a href="https://manager.harmix.ai/">
+  <a href="https://manager.harmix.ai/?utm_source=github&utm_medium=referral&utm_campaign=own_media&utm_content=ui_interface">
     <img src="https://img.shields.io/badge/Harmix-PAM%20Landing-orange" alt="Harmix PAM">
   </a>
 
   <a href="https://www.linkedin.com/company/harmix-proactive-ai-manager/posts/?feedView=all">
-    <img src="https://img.shields.io/badge/LinkedIn-Harmix-0077B5?logo=linkedin&logoColor=white" alt="LinkedIn">
+    <img src="https://img.shields.io/badge/LinkedIn-Harmix%20PAM-0077B5?logo=linkedin&logoColor=white" alt="LinkedIn">
   </a>
 </p>
 
 <p align="center">
 A constrained UI generation system where interfaces are built using only a predefined component library. The system evaluates context, gathers requirements through questions, then generates and evolves UIs predictably.
 </p>
+
+## Talk to our CTO
+
+Email: [oleksandr@harmix.ai](mailto:oleksandr@harmix.ai)  
+Schedule a meeting: [Book 30-minute call](https://calendly.com/oleksandr-harmix/30-minute-meeting)
+
+---
 
 ## Features
 
